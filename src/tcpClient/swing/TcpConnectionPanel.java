@@ -3,28 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpclient;
+package tcpClient.swing;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import tcpClient.connection.TcpConnection;
+import tcpClient.services.MessageDialogService;
+import tcpClient.services.ValidationService;
 
-/**
- *
- * @author cis
- */
 public class TcpConnectionPanel extends javax.swing.JFrame {
 
     private TcpClient tcpClient;
-    public static String hostIp;
-    public static int port;
+    private TcpConnection tcpConnection;
+    private ValidationService validationService = new ValidationService();
+    private MessageDialogService messageDialogService = new MessageDialogService();
+    
     /**
      * Creates new form TcpConnectionPanel
      */
@@ -46,7 +41,6 @@ public class TcpConnectionPanel extends javax.swing.JFrame {
         portNo = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        connectionProgress = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TCP Connection Window");
@@ -67,17 +61,11 @@ public class TcpConnectionPanel extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(30, 30, 30))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(connectionProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(connnectionBtn)
@@ -103,9 +91,7 @@ public class TcpConnectionPanel extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(portNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(connnectionBtn)
-                            .addComponent(connectionProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(connnectionBtn)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
@@ -136,41 +122,19 @@ public class TcpConnectionPanel extends javax.swing.JFrame {
     
     private void connnectionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connnectionBtnActionPerformed
         if (ipAddress.getText().trim().isEmpty() || portNo.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please check IP or port is empty.!!");
-        } else {
-            connnectionBtn.setEnabled(false);
-            connectionProgress.setText("Connecting...");
-            hostIp = ipAddress.getText();//host ip adress
-            port = Integer.parseInt(portNo.getText());
-            if (isPortInUse(hostIp, port)) {
-                try {
-                    connnectionBtn.setEnabled(false);
-                    String modifiedSentence;
-                    Socket clientSocket = new Socket(hostIp, port);
-                    if(clientSocket.isConnected()){
-                        connectionProgress.setText("Connected");
-                        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-                        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                        //sentence = inFromUser.readLine();
-                        //outToServer.writeBytes(sentence + '\n');
-                        modifiedSentence = inFromServer.readLine();
-                        System.out.println("FROM SERVER: " + modifiedSentence);
-                        dispose();
-                        tcpClient = new TcpClient();
-                        tcpClient.setVisible(true);                          
-                    }else{
-                        connectionProgress.setText("Invalid IP and port no.");
-                        connnectionBtn.setEnabled(true);
-                    }                    
-                } catch (UnknownHostException e) {
-                    System.out.println("Exception occured" + e);
-                } catch (Exception e) {
-                    Logger.getLogger(TcpConnectionPanel.class.getName()).log(Level.SEVERE, null, e);
-                }
+             messageDialogService.showError(this,"Please check IP or port is empty.!!");
+        } else if(!validationService.validatePort(portNo.getText())){
+            messageDialogService.showError(this, "Invalid port Number.!!");
+        }else {
+            tcpConnection = new TcpConnection();
+            Boolean isConnected = tcpConnection.doConnection(ipAddress.getText(), Integer.parseInt(portNo.getText()));
+            if(!isConnected){
+                 messageDialogService.showError(this, "Please check IP or Port is wrong.!!");
             }else{
-                connnectionBtn.setEnabled(true);
-            } 
+                tcpClient = new TcpClient();
+                tcpClient.setVisible(true);
+                this.dispose();
+            }
         }
     }//GEN-LAST:event_connnectionBtnActionPerformed
 
@@ -208,7 +172,6 @@ public class TcpConnectionPanel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel connectionProgress;
     private javax.swing.JButton connnectionBtn;
     private javax.swing.JTextField ipAddress;
     private javax.swing.JLabel jLabel1;
