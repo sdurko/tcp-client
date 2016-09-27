@@ -5,9 +5,11 @@
  */
 package tcpClient.swing;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import tcpClient.connection.TcpConnection;
+import javax.swing.JFrame;
+import tcpClient.services.ConnectionService;
+import tcpClient.services.DialogService;
+import tcpClient.services.MessageDialogService;
 /**
  *
  * @author cis
@@ -16,17 +18,18 @@ public class TcpClient extends javax.swing.JFrame {
     
     private JFileChooser fileChooser = new JFileChooser();
     private DetailPanel detailPanel;
-    private static TcpConnection tcpConnection;
-    
+    private static ConnectionService connectionService = new ConnectionService();
+    private static ConnectionPanel connectionPanel ;
+    private static DialogService dialogService= new DialogService();
+    private MessageDialogService messageDialogService = new MessageDialogService();
+    public static JFrame frame;
     /**
      * Creates new form TcpClient
      */
     public TcpClient() {
+        frame = this;
         initComponents();
-        tcpConnection  = new TcpConnection();
-        ipAddress.setText(tcpConnection.getHost());
-        port.setText(tcpConnection.getPort().toString());
-        connectionStatus.setText(tcpConnection.isConncted()? "Conncted" : "Disconnected");
+        connectionService.setConnetionDetails();
     }
 
     /**
@@ -41,7 +44,7 @@ public class TcpClient extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        message = new javax.swing.JTextArea();
         jSeparator1 = new javax.swing.JSeparator();
         jPanel2 = new javax.swing.JPanel();
         filePath = new javax.swing.JTextField();
@@ -49,20 +52,20 @@ public class TcpClient extends javax.swing.JFrame {
         timeDealy = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        send = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         ReceiveMessageTable = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         ReceiveMessageTable1 = new javax.swing.JTable();
-        jPanel4 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        connectionDetailPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        connectionStatus = new javax.swing.JLabel();
-        ipAddress = new javax.swing.JLabel();
         port = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        connectionStatus = new javax.swing.JLabel();
+        connectionButton = new javax.swing.JButton();
+        ipAddress = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tcp Client");
@@ -70,9 +73,9 @@ public class TcpClient extends javax.swing.JFrame {
         jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         jTabbedPane1.setToolTipText("Send");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        message.setColumns(20);
+        message.setRows(5);
+        jScrollPane1.setViewportView(message);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Send Multiple"));
         jPanel2.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -83,12 +86,6 @@ public class TcpClient extends javax.swing.JFrame {
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
-            }
-        });
-
-        timeDealy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeDealyActionPerformed(evt);
             }
         });
 
@@ -129,7 +126,12 @@ public class TcpClient extends javax.swing.JFrame {
                 .addGap(26, 26, 26))
         );
 
-        jButton1.setText("Send");
+        send.setText("Send");
+        send.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -140,7 +142,7 @@ public class TcpClient extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 834, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(19, Short.MAX_VALUE))
@@ -155,7 +157,7 @@ public class TcpClient extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
@@ -247,63 +249,65 @@ public class TcpClient extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Errors ", jScrollPane3);
 
-        jButton3.setText("Disconnect");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+        connectionDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Connection Detail"));
 
         jLabel1.setText("IP Address :");
 
         jLabel2.setText("Port No. :");
 
-        connectionStatus.setText("Disconnected");
-
-        ipAddress.setText("--");
-
         port.setText("--");
 
         jLabel8.setText("Status :");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+        connectionStatus.setText("Disconnected");
+
+        connectionButton.setText("Connect");
+        connectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                connectionButtonActionPerformed(evt);
+            }
+        });
+
+        ipAddress.setText("--");
+
+        javax.swing.GroupLayout connectionDetailPanelLayout = new javax.swing.GroupLayout(connectionDetailPanel);
+        connectionDetailPanel.setLayout(connectionDetailPanelLayout);
+        connectionDetailPanelLayout.setHorizontalGroup(
+            connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, connectionDetailPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ipAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(ipAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(port, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(port, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(connectionStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addComponent(connectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18))
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        connectionDetailPanelLayout.setVerticalGroup(
+            connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(connectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addComponent(jLabel2)
                 .addComponent(connectionStatus)
-                .addComponent(ipAddress)
                 .addComponent(port)
-                .addComponent(jLabel8))
+                .addComponent(jLabel8)
+                .addComponent(ipAddress))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(connectionDetailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 880, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -313,20 +317,16 @@ public class TcpClient extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(connectionDetailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(486, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addGap(0, 50, Short.MAX_VALUE)
+                    .addGap(0, 73, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 477, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void timeDealyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeDealyActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_timeDealyActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         fileChooser.setVisible(true);
@@ -337,17 +337,50 @@ public class TcpClient extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void ReceiveMessageTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReceiveMessageTableMouseClicked
-    JDialog dialog = new JDialog(this, "Message Detail", true);
-    detailPanel= new DetailPanel(dialog);
-    dialog.getContentPane().add(detailPanel);
-    dialog.pack();
-    dialog.setVisible(true);
+    detailPanel= new DetailPanel();
+    dialogService.createDilog(this, "Message Detail", detailPanel);
+    dialogService.setVisible(true);
     }//GEN-LAST:event_ReceiveMessageTableMouseClicked
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        tcpConnection.doDisconnect();
-        dispose();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void connectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectionButtonActionPerformed
+        if("Disconnect".equals(connectionButton.getText())){
+            connectionService.disconect();
+        }else{
+            openConnectionWindow();
+        }
+        connectionService.setConnetionDetails();
+    }//GEN-LAST:event_connectionButtonActionPerformed
+
+    private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
+    if(!message.getText().isEmpty()){
+        if(connectionService.isConnected()){
+           connectionService.writeOnServer(message.getText());
+        }
+    }else{
+        messageDialogService.showError(this, "Con't send empty message..!!");
+    }
+    }//GEN-LAST:event_sendActionPerformed
+
+    /**
+     * set ConectionDetail like ip, poet, status
+    */
+    public static void setConectionDetail(String ip, Integer portNo, boolean status){
+        if(ipAddress != null && port != null && connectionStatus != null){
+            ipAddress.setText(ip == null ? "--" : ip);
+            port.setText(portNo == null ? "--" : portNo.toString());
+            connectionStatus.setText(status ? "Connected" : "Disconnected");
+            connectionButton.setText(status ? "Disconnect" : "Connect");
+        }
+    }
+
+    /**
+     * open connection window to create connection
+    */
+    public static void openConnectionWindow(){
+       connectionPanel = new ConnectionPanel();
+       dialogService.createDilog(frame, "Connection Window",connectionPanel);
+        dialogService.setVisible(true);
+    }
 
     /**
      * @param args the command line arguments
@@ -380,6 +413,8 @@ public class TcpClient extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new TcpClient().setVisible(true);
+                openConnectionWindow();
+                connectionService.setConnetionDetails();
             }
         });
     }
@@ -387,12 +422,12 @@ public class TcpClient extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable ReceiveMessageTable;
     private javax.swing.JTable ReceiveMessageTable1;
-    private javax.swing.JLabel connectionStatus;
+    private static javax.swing.JButton connectionButton;
+    private static javax.swing.JPanel connectionDetailPanel;
+    private static javax.swing.JLabel connectionStatus;
     private javax.swing.JTextField filePath;
-    private javax.swing.JLabel ipAddress;
-    private javax.swing.JButton jButton1;
+    private static javax.swing.JLabel ipAddress;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
@@ -401,14 +436,14 @@ public class TcpClient extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JLabel port;
+    private javax.swing.JTextArea message;
+    private static javax.swing.JLabel port;
+    private javax.swing.JButton send;
     private javax.swing.JTextField timeDealy;
     // End of variables declaration//GEN-END:variables
 }

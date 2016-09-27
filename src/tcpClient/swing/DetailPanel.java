@@ -6,6 +6,7 @@
 package tcpClient.swing;
 
 import javax.swing.JDialog;
+import tcpClient.services.DialogService;
 
 /**
  *
@@ -16,9 +17,7 @@ public class DetailPanel extends javax.swing.JPanel {
     /**
      * Creates new form Detail
      */
-    private JDialog dialog;
-    public DetailPanel(JDialog dialog) {
-        this.dialog = dialog;
+    public DetailPanel() {
         initComponents();
     }
 
@@ -103,7 +102,7 @@ public class DetailPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
-        dialog.dispose();
+        DialogService.close();
     }//GEN-LAST:event_okActionPerformed
 
 
