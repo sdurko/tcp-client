@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.Timer;
+import tcpClient.swing.PopupPanel;
 import tcpClient.swing.TcpClient;
 
 /**
@@ -26,8 +27,8 @@ public class PopupService {
      PopupFactory factory = PopupFactory.getSharedInstance();
      //create message as label
      Component component = TcpClient.frame;
-     JLabel messageLabel = new JLabel(message);
-        final Popup popup = factory.getPopup(component, messageLabel, component.getX(), component.getY()+30);
+     PopupPanel popupPanel = new PopupPanel(message);
+        final Popup popup = factory.getPopup(component, popupPanel, component.getX(), component.getY()+30);
         popup.show();
         ActionListener hider = new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -35,7 +36,7 @@ public class PopupService {
           }
         };
       // Hide popup in 3 seconds
-      Timer timer = new Timer(1000, hider);
+      Timer timer = new Timer(2000, hider);
       timer.start();
     }
 }

@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.logging.Logger;
 import tcpClient.connection.TcpConnection;
+import tcpClient.swing.ConnectionWindow;
 import tcpClient.swing.TcpClient;
 
 /**
@@ -21,12 +22,15 @@ public class ConnectionService {
    private static TcpClient tcpClient;
    private static final Logger LOGGER = Logger.getLogger(ConnectionService.class.getName());
    private static ReceiverService receiverService;
+   private ConnectionWindow connectionWindow;
 
     /**
      * This method used to disconnect from server.
     */
    public void disconect(){
        tcpConnection.doDisconnect();
+       connectionWindow = new ConnectionWindow();
+       connectionWindow.setVisible(true);
    }
 
     /**
@@ -37,7 +41,6 @@ public class ConnectionService {
        boolean status = tcpConnection.isConncted();
        if(!status){
            setConnetionDetails();
-           openConnectionWindow();
        }
        return status;
    }
@@ -47,13 +50,6 @@ public class ConnectionService {
     */
    public void setConnetionDetails(){
        tcpClient.setConectionDetail(tcpConnection.getHost(),tcpConnection.getPort(),tcpConnection.isConncted());
-   }
-
-   /**
-    * This method used to open connection window over the application if its not connected.
-   */
-   public void openConnectionWindow(){
-       tcpClient.openConnectionWindow();
    }
 
    /**
@@ -93,10 +89,4 @@ public class ConnectionService {
        receiverService.start();
    }
 
-   /**
-    * This method used to stop read server.
-   */
-   public void stoprReciver(){
-       receiverService.terminate();
-   }
 }

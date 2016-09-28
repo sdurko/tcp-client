@@ -5,11 +5,11 @@
  */
 package tcpClient.services;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tcpClient.swing.TcpClient;
 
 /**
  *
@@ -17,29 +17,23 @@ import java.util.logging.Logger;
  */
 public class ReceiverService extends Thread{
     private ConnectionService connectionService = new ConnectionService();
-    private static boolean stopRunning = false;
     public void run(){
         DataInputStream dis= connectionService.readFromServer();
         PopupService popupService=new PopupService();
         String responseLine;
         try {
-            while((responseLine = dis.readUTF()) != null){
-                if(stopRunning){
+            while(connectionService.isConnected() && (responseLine = dis.readLine()) != null){
+                if(!connectionService.isConnected()){
                     break;
                 }
                 popupService.createPupup(responseLine);
+                TcpClient.addRowInMassageTable(responseLine);
             }
-        } catch (IOException ex) {
+        } catch(java.net.SocketException ex){
+            Logger.getLogger(ReceiverService.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+        }catch (IOException ex) {
             Logger.getLogger(ReceiverService.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    /**
-    *This method used to terminate the thread.
-    */
-    public void terminate(){
-        stopRunning = true;
-        connectionService.writeOnServer("");
     }
 
 }

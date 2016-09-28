@@ -5,8 +5,13 @@
  */
 package tcpClient.swing;
 
+import java.time.LocalDateTime;
+import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import tcpClient.services.ConnectionService;
 import tcpClient.services.DialogService;
 import tcpClient.services.MessageDialogService;
@@ -18,10 +23,10 @@ public class TcpClient extends javax.swing.JFrame {
     
     private JFileChooser fileChooser = new JFileChooser();
     private DetailPanel detailPanel;
+    private DialogService dialogService = new DialogService();
     private static ConnectionService connectionService = new ConnectionService();
-    private static ConnectionPanel connectionPanel ;
-    private static DialogService dialogService= new DialogService();
     private MessageDialogService messageDialogService = new MessageDialogService();
+    private static DefaultTableModel messageTableModel;
     public static JFrame frame;
     /**
      * Creates new form TcpClient
@@ -29,6 +34,7 @@ public class TcpClient extends javax.swing.JFrame {
     public TcpClient() {
         frame = this;
         initComponents();
+        messageTableModel = (DefaultTableModel) ReceiveMessageTable.getModel();
         connectionService.setConnetionDetails();
     }
 
@@ -57,7 +63,7 @@ public class TcpClient extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         ReceiveMessageTable = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
-        ReceiveMessageTable1 = new javax.swing.JTable();
+        errorMessageTable = new javax.swing.JTable();
         connectionDetailPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -165,22 +171,31 @@ public class TcpClient extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
+        ReceiveMessageTable.setAutoCreateRowSorter(true);
+        ReceiveMessageTable.setBackground(java.awt.Color.black);
         ReceiveMessageTable.setForeground(java.awt.Color.green);
         ReceiveMessageTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"asas", "asasa", "asasa", "asasa"},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Sr No.", "Message", "Sender", "Time"
             }
-        ));
-        ReceiveMessageTable.setGridColor(java.awt.Color.red);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        ReceiveMessageTable.setFocusable(false);
+        ReceiveMessageTable.setGridColor(java.awt.Color.white);
         ReceiveMessageTable.setIntercellSpacing(new java.awt.Dimension(5, 5));
+        ReceiveMessageTable.setRowHeight(20);
         ReceiveMessageTable.setSelectionForeground(java.awt.Color.black);
+        ReceiveMessageTable.setSurrendersFocusOnKeystroke(true);
         ReceiveMessageTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ReceiveMessageTableMouseClicked(evt);
@@ -210,9 +225,9 @@ public class TcpClient extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Receive", jPanel3);
 
-        ReceiveMessageTable1.setBackground(new java.awt.Color(16, 6, 6));
-        ReceiveMessageTable1.setForeground(java.awt.Color.red);
-        ReceiveMessageTable1.setModel(new javax.swing.table.DefaultTableModel(
+        errorMessageTable.setBackground(new java.awt.Color(16, 6, 6));
+        errorMessageTable.setForeground(java.awt.Color.red);
+        errorMessageTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, "asasa", "asasa"},
                 {null, null, null},
@@ -239,12 +254,14 @@ public class TcpClient extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        ReceiveMessageTable1.setGridColor(java.awt.Color.white);
-        jScrollPane3.setViewportView(ReceiveMessageTable1);
-        if (ReceiveMessageTable1.getColumnModel().getColumnCount() > 0) {
-            ReceiveMessageTable1.getColumnModel().getColumn(0).setPreferredWidth(15);
-            ReceiveMessageTable1.getColumnModel().getColumn(1).setResizable(false);
-            ReceiveMessageTable1.getColumnModel().getColumn(2).setResizable(false);
+        errorMessageTable.setGridColor(java.awt.Color.white);
+        errorMessageTable.setRowHeight(20);
+        errorMessageTable.setRowMargin(5);
+        jScrollPane3.setViewportView(errorMessageTable);
+        if (errorMessageTable.getColumnModel().getColumnCount() > 0) {
+            errorMessageTable.getColumnModel().getColumn(0).setPreferredWidth(15);
+            errorMessageTable.getColumnModel().getColumn(1).setResizable(false);
+            errorMessageTable.getColumnModel().getColumn(2).setResizable(false);
         }
 
         jTabbedPane1.addTab("Errors ", jScrollPane3);
@@ -276,9 +293,9 @@ public class TcpClient extends javax.swing.JFrame {
             connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, connectionDetailPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ipAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(ipAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -287,7 +304,7 @@ public class TcpClient extends javax.swing.JFrame {
                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(connectionStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(connectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
         );
@@ -337,7 +354,8 @@ public class TcpClient extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void ReceiveMessageTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReceiveMessageTableMouseClicked
-    detailPanel= new DetailPanel();
+    int row = ReceiveMessageTable.getSelectedRow();
+    detailPanel= new DetailPanel((String)ReceiveMessageTable.getValueAt(row, 1),(String)ReceiveMessageTable.getValueAt(row, 2),(LocalDateTime)ReceiveMessageTable.getValueAt(row, 3));
     dialogService.createDilog(this, "Message Detail", detailPanel);
     dialogService.setVisible(true);
     }//GEN-LAST:event_ReceiveMessageTableMouseClicked
@@ -345,8 +363,7 @@ public class TcpClient extends javax.swing.JFrame {
     private void connectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectionButtonActionPerformed
         if("Disconnect".equals(connectionButton.getText())){
             connectionService.disconect();
-        }else{
-            openConnectionWindow();
+            this.dispose();
         }
         connectionService.setConnetionDetails();
     }//GEN-LAST:event_connectionButtonActionPerformed
@@ -374,14 +391,12 @@ public class TcpClient extends javax.swing.JFrame {
     }
 
     /**
-     * open connection window to create connection
+     * This method used to add row in message table.
     */
-    public static void openConnectionWindow(){
-       connectionPanel = new ConnectionPanel();
-       dialogService.createDilog(frame, "Connection Window",connectionPanel);
-        dialogService.setVisible(true);
+    public static void addRowInMassageTable(String Message){
+        messageTableModel.addRow(new Object[]{messageTableModel.getRowCount()+1,Message,"localhost",LocalDateTime.now()});
+        
     }
-
     /**
      * @param args the command line arguments
      */
@@ -413,18 +428,16 @@ public class TcpClient extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new TcpClient().setVisible(true);
-                openConnectionWindow();
-                connectionService.setConnetionDetails();
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable ReceiveMessageTable;
-    private javax.swing.JTable ReceiveMessageTable1;
     private static javax.swing.JButton connectionButton;
     private static javax.swing.JPanel connectionDetailPanel;
     private static javax.swing.JLabel connectionStatus;
+    private javax.swing.JTable errorMessageTable;
     private javax.swing.JTextField filePath;
     private static javax.swing.JLabel ipAddress;
     private javax.swing.JButton jButton2;

@@ -16,11 +16,13 @@ import javax.swing.JDialog;
 public class DialogService {
 
     private static JDialog dialog;
+    private static Frame owner;
 
     /**
     * This method used to create a child window with Component
    */    
     public void createDilog(Frame owner, String Title,  Component comp){
+        this.owner = owner;
         dialog = new JDialog(owner, Title, true);
         dialog.getContentPane().add(comp);
         dialog.pack();
@@ -38,6 +40,13 @@ public class DialogService {
    */
     public static void close(){
         dialog.dispose();
+    }
+
+    /**
+    * This method used to close parent frame
+   */
+    public static void closeOwner(){
+        owner.dispose();
     }
 
 }

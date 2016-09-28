@@ -51,7 +51,7 @@ public class TcpConnection {
      * This method used to check connection it will return true if socket is connected.
      */
     public Boolean isConncted(){
-        return socket != null && socket.isConnected();
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     /**

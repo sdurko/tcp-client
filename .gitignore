@@ -1,3 +1,7 @@
-
-build/
+# Folders to ignore
+build
+.project
+.settings/
 nbproject/
+dist/
+
