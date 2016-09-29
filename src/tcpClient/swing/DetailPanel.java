@@ -20,7 +20,12 @@ public class DetailPanel extends javax.swing.JPanel {
     public DetailPanel(String message, String sender, LocalDateTime time) {
         initComponents();
         messageArea.setText(message);
-        senderTextField.setText(sender);
+        if(sender != null){
+            senderTextField.setText(sender);
+        }else{
+            senderTextField.setVisible(false);
+            senderjLabel.setVisible(false);
+        }
         timeTextField.setText(time.toString());
     }
 
@@ -37,7 +42,7 @@ public class DetailPanel extends javax.swing.JPanel {
         timeTextField = new javax.swing.JTextField();
         ok = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        senderjLabel = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         messageArea = new javax.swing.JTextArea();
@@ -57,7 +62,7 @@ public class DetailPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Message :");
 
-        jLabel3.setText("Sender :");
+        senderjLabel.setText("Sender :");
 
         jLabel4.setText("Date Time:");
 
@@ -79,7 +84,7 @@ public class DetailPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel3))
+                            .addComponent(senderjLabel))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -99,7 +104,7 @@ public class DetailPanel extends javax.swing.JPanel {
                 .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(senderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(senderjLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(timeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -116,12 +121,12 @@ public class DetailPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea messageArea;
     private javax.swing.JButton ok;
     private javax.swing.JTextField senderTextField;
+    private javax.swing.JLabel senderjLabel;
     private javax.swing.JTextField timeTextField;
     // End of variables declaration//GEN-END:variables
 }

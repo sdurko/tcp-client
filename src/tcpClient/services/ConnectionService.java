@@ -25,7 +25,7 @@ public class ConnectionService {
    private ConnectionWindow connectionWindow;
 
     /**
-     * This method used to disconnect from server.
+     * This method used to disconnect from server and open connection window.
     */
    public void disconect(){
        tcpConnection.doDisconnect();
@@ -41,6 +41,7 @@ public class ConnectionService {
        boolean status = tcpConnection.isConncted();
        if(!status){
            setConnetionDetails();
+           tcpClient.addRowInErrorTable("Appication is disconnected");
        }
        return status;
    }
@@ -60,10 +61,12 @@ public class ConnectionService {
         try {
            output = new DataOutputStream(tcpConnection.getOutputStream());
            output.writeBytes(message);
+           output.flush();
         }
         catch (Exception e) {
             e.printStackTrace();
-           LOGGER.getLogger("OutputStream failed to write"+e);
+           tcpClient.addRowInErrorTable("Message sending failed due to ".concat(e.toString()));
+           
         }
    }
 
@@ -76,7 +79,7 @@ public class ConnectionService {
         }
         catch (Exception e) {
             e.printStackTrace();
-           LOGGER.getLogger("OutputStream failed to write"+e);
+           tcpClient.addRowInErrorTable("Message reading failed due to ".concat(e.toString()));
         }
         return null;
    }
@@ -87,6 +90,14 @@ public class ConnectionService {
    public void startReciver(){
        receiverService = new ReceiverService();
        receiverService.start();
+   }
+
+    /**
+    * This method used to start read server.
+   */
+   public void stopReciver(){
+       receiverService.interrupt();
+       receiverService.stop();
    }
 
 }

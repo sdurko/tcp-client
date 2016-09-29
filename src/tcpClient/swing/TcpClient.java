@@ -6,17 +6,15 @@
 package tcpClient.swing;
 
 import java.time.LocalDateTime;
-import java.util.Vector;
+import javafx.animation.Animation.Status;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import tcpClient.services.ConnectionService;
 import tcpClient.services.DialogService;
 import tcpClient.services.MessageDialogService;
-/**
- *
+
+/*
  * @author cis
  */
 public class TcpClient extends javax.swing.JFrame {
@@ -27,6 +25,7 @@ public class TcpClient extends javax.swing.JFrame {
     private static ConnectionService connectionService = new ConnectionService();
     private MessageDialogService messageDialogService = new MessageDialogService();
     private static DefaultTableModel messageTableModel;
+    private static DefaultTableModel errorTableModel;
     public static JFrame frame;
     /**
      * Creates new form TcpClient
@@ -35,6 +34,7 @@ public class TcpClient extends javax.swing.JFrame {
         frame = this;
         initComponents();
         messageTableModel = (DefaultTableModel) ReceiveMessageTable.getModel();
+        errorTableModel = (DefaultTableModel) errorMessageTable.getModel();
         connectionService.setConnetionDetails();
     }
 
@@ -229,11 +229,7 @@ public class TcpClient extends javax.swing.JFrame {
         errorMessageTable.setForeground(java.awt.Color.red);
         errorMessageTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, "asasa", "asasa"},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Sr No.", "Error Message", "DateTime"
@@ -257,6 +253,11 @@ public class TcpClient extends javax.swing.JFrame {
         errorMessageTable.setGridColor(java.awt.Color.white);
         errorMessageTable.setRowHeight(20);
         errorMessageTable.setRowMargin(5);
+        errorMessageTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                errorMessageTableMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(errorMessageTable);
         if (errorMessageTable.getColumnModel().getColumnCount() > 0) {
             errorMessageTable.getColumnModel().getColumn(0).setPreferredWidth(15);
@@ -363,6 +364,7 @@ public class TcpClient extends javax.swing.JFrame {
     private void connectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectionButtonActionPerformed
         if("Disconnect".equals(connectionButton.getText())){
             connectionService.disconect();
+            connectionService.stopReciver();
             this.dispose();
         }
         connectionService.setConnetionDetails();
@@ -377,6 +379,13 @@ public class TcpClient extends javax.swing.JFrame {
         messageDialogService.showError(this, "Con't send empty message..!!");
     }
     }//GEN-LAST:event_sendActionPerformed
+
+    private void errorMessageTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_errorMessageTableMouseClicked
+    int row = errorMessageTable.getSelectedRow();
+    detailPanel= new DetailPanel((String)errorMessageTable.getValueAt(row, 1), null, (LocalDateTime)errorMessageTable.getValueAt(row, 2));
+    dialogService.createDilog(this, "Message Detail", detailPanel);
+    dialogService.setVisible(true);
+    }//GEN-LAST:event_errorMessageTableMouseClicked
 
     /**
      * set ConectionDetail like ip, poet, status
@@ -395,7 +404,13 @@ public class TcpClient extends javax.swing.JFrame {
     */
     public static void addRowInMassageTable(String Message){
         messageTableModel.addRow(new Object[]{messageTableModel.getRowCount()+1,Message,"localhost",LocalDateTime.now()});
-        
+    }
+
+    /**
+     * This method used to add row in error table.
+    */
+    public static void addRowInErrorTable(String Message){
+        errorTableModel.addRow(new Object[]{errorTableModel.getRowCount()+1,Message,LocalDateTime.now()});
     }
     /**
      * @param args the command line arguments
