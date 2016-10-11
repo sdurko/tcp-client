@@ -6,19 +6,24 @@
 package tcpClient.swing;
 
 import java.time.LocalDateTime;
-import javafx.animation.Animation.Status;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
 import tcpClient.services.ConnectionService;
 import tcpClient.services.DialogService;
 import tcpClient.services.MessageDialogService;
+import tcpClient.services.PopupService;
+import tcpClient.services.ValidationService;
 
 /*
  * @author cis
  */
 public class TcpClient extends javax.swing.JFrame {
-    
+
+    /**
+     * Status of connection for application.
+     */
+    public enum connetionStatus {CONNECTED, DISCONNECTED};
     private JFileChooser fileChooser = new JFileChooser();
     private DetailPanel detailPanel;
     private DialogService dialogService = new DialogService();
@@ -26,7 +31,10 @@ public class TcpClient extends javax.swing.JFrame {
     private MessageDialogService messageDialogService = new MessageDialogService();
     private static DefaultTableModel messageTableModel;
     private static DefaultTableModel errorTableModel;
+    private ValidationService validationService = new ValidationService();
+    private PopupService popUp = new PopupService();
     public static JFrame frame;
+
     /**
      * Creates new form TcpClient
      */
@@ -35,7 +43,6 @@ public class TcpClient extends javax.swing.JFrame {
         initComponents();
         messageTableModel = (DefaultTableModel) ReceiveMessageTable.getModel();
         errorTableModel = (DefaultTableModel) errorMessageTable.getModel();
-        connectionService.setConnetionDetails();
     }
 
     /**
@@ -67,11 +74,11 @@ public class TcpClient extends javax.swing.JFrame {
         connectionDetailPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        port = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         connectionStatus = new javax.swing.JLabel();
         connectionButton = new javax.swing.JButton();
-        ipAddress = new javax.swing.JLabel();
+        ipTextField = new javax.swing.JTextField();
+        portTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tcp Client");
@@ -147,11 +154,13 @@ public class TcpClient extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 834, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 7, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -267,17 +276,15 @@ public class TcpClient extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Errors ", jScrollPane3);
 
-        connectionDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Connection Detail"));
+        connectionDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Connection"));
 
         jLabel1.setText("IP Address :");
 
         jLabel2.setText("Port No. :");
 
-        port.setText("--");
-
         jLabel8.setText("Status :");
 
-        connectionStatus.setText("Disconnected");
+        connectionStatus.setText("DISCONNECTED");
 
         connectionButton.setText("Connect");
         connectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -286,7 +293,9 @@ public class TcpClient extends javax.swing.JFrame {
             }
         });
 
-        ipAddress.setText("--");
+        ipTextField.setText("localhost");
+
+        portTextField.setText("2001");
 
         javax.swing.GroupLayout connectionDetailPanelLayout = new javax.swing.GroupLayout(connectionDetailPanel);
         connectionDetailPanel.setLayout(connectionDetailPanelLayout);
@@ -294,20 +303,20 @@ public class TcpClient extends javax.swing.JFrame {
             connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, connectionDetailPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(ipAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
+                .addComponent(jLabel1)
+                .addGap(4, 4, 4)
+                .addComponent(ipTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(port, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(connectionStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addGap(3, 3, 3)
+                .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(connectionStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(connectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+                .addContainerGap())
         );
         connectionDetailPanelLayout.setVerticalGroup(
             connectionDetailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,16 +325,16 @@ public class TcpClient extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addComponent(jLabel2)
                 .addComponent(connectionStatus)
-                .addComponent(port)
                 .addComponent(jLabel8)
-                .addComponent(ipAddress))
+                .addComponent(ipTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(connectionDetailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(connectionDetailPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 880, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -362,18 +371,41 @@ public class TcpClient extends javax.swing.JFrame {
     }//GEN-LAST:event_ReceiveMessageTableMouseClicked
 
     private void connectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectionButtonActionPerformed
-        if("Disconnect".equals(connectionButton.getText())){
-            connectionService.disconect();
-            connectionService.stopReciver();
-            this.dispose();
+        if("Connect".equals(connectionButton.getText())){
+            String ipAddress = ipTextField.getText().trim();
+            String portNo = portTextField.getText().trim();
+            if (ipAddress.isEmpty() || portNo.isEmpty()) {
+            messageDialogService.showError(this,"Please check IP or port is empty.!!");
+            } else if(!validationService.validatePort(portNo)){
+                messageDialogService.showError(this, "Invalid port Number.!!");
+            }else {
+                Boolean isConnected = connectionService.createConnection(ipAddress, Integer.parseInt(portNo));            
+                if(!isConnected){
+                    messageDialogService.showError(this, "Please check IP or Port is wrong.!!");
+                }else{
+                    connectionService.startReciver();
+                }
+            }
+        }else{
+           connectionService.disconect();
+           connectionService.stopReciver();
+           messageTableModel.getDataVector().removeAllElements();
+           messageTableModel.fireTableDataChanged();
+           errorTableModel.getDataVector().removeAllElements();
+           errorTableModel.fireTableDataChanged();
         }
-        connectionService.setConnetionDetails();
+        updateConnectionWindow();
     }//GEN-LAST:event_connectionButtonActionPerformed
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
     if(!message.getText().isEmpty()){
         if(connectionService.isConnected()){
-           connectionService.writeOnServer(message.getText());
+           if(connectionService.writeOnServer(message.getText())){
+               popUp.createPupup("Message send successfully...!!");
+               message.setText("");
+           }else{
+               popUp.createPupup("Message sending failed...!!");
+           }
         }
     }else{
         messageDialogService.showError(this, "Con't send empty message..!!");
@@ -388,14 +420,19 @@ public class TcpClient extends javax.swing.JFrame {
     }//GEN-LAST:event_errorMessageTableMouseClicked
 
     /**
-     * set ConectionDetail like ip, poet, status
+     * To update connection window according current connection status.
     */
-    public static void setConectionDetail(String ip, Integer portNo, boolean status){
-        if(ipAddress != null && port != null && connectionStatus != null){
-            ipAddress.setText(ip == null ? "--" : ip);
-            port.setText(portNo == null ? "--" : portNo.toString());
-            connectionStatus.setText(status ? "Connected" : "Disconnected");
-            connectionButton.setText(status ? "Disconnect" : "Connect");
+    public static void updateConnectionWindow(){
+        if(connectionService.isConnected()){
+            connectionStatus.setText("CONNECTED");
+            connectionButton.setText("Disconnect");
+            ipTextField.setEditable(false);
+            portTextField.setEditable(false);
+        }else{
+            connectionStatus.setText("DISCONNECTED");
+            connectionButton.setText("Connect");
+            ipTextField.setEditable(true);
+            portTextField.setEditable(true);
         }
     }
 
@@ -454,7 +491,7 @@ public class TcpClient extends javax.swing.JFrame {
     private static javax.swing.JLabel connectionStatus;
     private javax.swing.JTable errorMessageTable;
     private javax.swing.JTextField filePath;
-    private static javax.swing.JLabel ipAddress;
+    private static javax.swing.JTextField ipTextField;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -470,7 +507,7 @@ public class TcpClient extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea message;
-    private static javax.swing.JLabel port;
+    private static javax.swing.JTextField portTextField;
     private javax.swing.JButton send;
     private javax.swing.JTextField timeDealy;
     // End of variables declaration//GEN-END:variables

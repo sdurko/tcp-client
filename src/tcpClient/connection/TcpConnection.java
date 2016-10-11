@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import tcpClient.swing.TcpClient;
 
 public class TcpConnection {
     private static Socket socket;
@@ -24,7 +24,7 @@ public class TcpConnection {
         }
         catch (IOException ex) {
             ex.printStackTrace();
-            LOGGER.getLogger("Connection failed"+ ex);
+            TcpClient.addRowInErrorTable("Connetion faild due to : ".concat(ex.toString()));
         }
         return false;
     }
@@ -43,7 +43,7 @@ public class TcpConnection {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            LOGGER.getLogger("Disconnected failed"+ex);
+            TcpClient.addRowInErrorTable("Disconnection failed due to : ".concat(ex.toString()));
         }
  }
  
@@ -61,7 +61,8 @@ public class TcpConnection {
         try {
             return socket.getOutputStream();
         } catch (IOException ex) {
-            LOGGER.getLogger("OutputStream failed",TcpConnection.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+            TcpClient.addRowInErrorTable("Server writing failed due to : ".concat(ex.toString()));
         }
         return null;
     }
@@ -74,7 +75,7 @@ public class TcpConnection {
             return socket.getInputStream();
         } catch (IOException ex) {
             ex.printStackTrace();
-           LOGGER.getLogger("InsputStream failed"+ex);
+           TcpClient.addRowInErrorTable("Server reading failed due to : ".concat(ex.toString()));
         }
         return null;
     }

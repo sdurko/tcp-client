@@ -18,7 +18,7 @@ import tcpClient.swing.TcpClient;
 public class ReceiverService extends Thread{
     private ConnectionService connectionService = new ConnectionService();
     public void run(){
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<Start>>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<Receiver Start>>>>>>>>>>>>>>>>>>>>>>");
         DataInputStream dis= connectionService.readFromServer();
         PopupService popupService=new PopupService();
         String responseLine;
@@ -35,7 +35,7 @@ public class ReceiverService extends Thread{
         }catch (IOException ex) {           
             Logger.getLogger(ReceiverService.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<Terminated>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<Receiver Terminated>>>>>>>>>>>>>>>>>>>>>");
     }
 
 }

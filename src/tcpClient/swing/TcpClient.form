@@ -24,7 +24,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="connectionDetailPanel" min="-2" max="-2" attributes="0"/>
+          <Component id="connectionDetailPanel" alignment="0" max="32767" attributes="0"/>
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jTabbedPane1" min="-2" pref="880" max="-2" attributes="0"/>
@@ -74,13 +74,16 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                              <Component id="send" min="-2" pref="117" max="-2" attributes="0"/>
-                              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="send" min="-2" pref="117" max="-2" attributes="0"/>
+                                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="0" pref="7" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="jScrollPane1" alignment="0" min="-2" pref="834" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="19" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -383,7 +386,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Connection Detail"/>
+            <TitledBorder title="Connection"/>
           </Border>
         </Property>
       </Properties>
@@ -396,20 +399,20 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" pref="109" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="ipAddress" min="-2" pref="147" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                  <Component id="ipTextField" min="-2" pref="214" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="port" min="-2" pref="95" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                  <Component id="jLabel8" min="-2" pref="60" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="connectionStatus" min="-2" pref="109" max="-2" attributes="0"/>
-                  <EmptySpace pref="25" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                  <Component id="portTextField" min="-2" pref="156" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jLabel8" min="-2" pref="54" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="connectionStatus" min="-2" pref="117" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="connectionButton" min="-2" pref="116" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -420,9 +423,9 @@
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="connectionStatus" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="port" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ipAddress" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="ipTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="portTextField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -438,14 +441,6 @@
             <Property name="text" type="java.lang.String" value="Port No. :"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="port">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="--"/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
-          </AuxValues>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
             <Property name="text" type="java.lang.String" value="Status :"/>
@@ -453,7 +448,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="connectionStatus">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Disconnected"/>
+            <Property name="text" type="java.lang.String" value="DISCONNECTED"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
@@ -470,9 +465,17 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JLabel" name="ipAddress">
+        <Component class="javax.swing.JTextField" name="ipTextField">
           <Properties>
-            <Property name="text" type="java.lang.String" value="--"/>
+            <Property name="text" type="java.lang.String" value="localhost"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JTextField" name="portTextField">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="2001"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
