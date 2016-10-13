@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.services;
+package com.tcpClient.messaging.service;
 
+import com.tcpClient.connection.ConnectionService;
+import com.tcpClient.services.PopupService;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tcpClient.swing.TcpClient;
+import com.tcpClient.swing.TcpClient;
 
 /**
  *

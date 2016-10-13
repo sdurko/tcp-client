@@ -3,17 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.swing;
+package com.tcpClient.swing;
 
 import java.time.LocalDateTime;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
-import tcpClient.services.ConnectionService;
-import tcpClient.services.DialogService;
-import tcpClient.services.MessageDialogService;
-import tcpClient.services.PopupService;
-import tcpClient.services.ValidationService;
+import com.tcpClient.connection.ConnectionService;
+import com.tcpClient.messaging.service.SendMessage;
+import com.tcpClient.services.DialogService;
+import com.tcpClient.services.MessageDialogService;
+import com.tcpClient.services.PopupService;
+import com.tcpClient.services.ValidationService;
+import java.nio.file.Paths;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
  * @author cis
@@ -23,8 +26,7 @@ public class TcpClient extends javax.swing.JFrame {
     /**
      * Status of connection for application.
      */
-    public enum connetionStatus {CONNECTED, DISCONNECTED};
-    private JFileChooser fileChooser = new JFileChooser();
+    public enum connetionStatus {CONNECTED, DISCONNECTED};    
     private DetailPanel detailPanel;
     private DialogService dialogService = new DialogService();
     private static ConnectionService connectionService = new ConnectionService();
@@ -34,6 +36,9 @@ public class TcpClient extends javax.swing.JFrame {
     private ValidationService validationService = new ValidationService();
     private PopupService popUp = new PopupService();
     public static JFrame frame;
+    private final FileNameExtensionFilter FILE_FILTER = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+    private static SendMessage sendMessage= new SendMessage();
+    private JFileChooser fileChooser = new JFileChooser();
 
     /**
      * Creates new form TcpClient
@@ -43,6 +48,7 @@ public class TcpClient extends javax.swing.JFrame {
         initComponents();
         messageTableModel = (DefaultTableModel) ReceiveMessageTable.getModel();
         errorTableModel = (DefaultTableModel) errorMessageTable.getModel();
+        fileChooser.setFileFilter(FILE_FILTER);
     }
 
     /**
@@ -62,9 +68,9 @@ public class TcpClient extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         filePath = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
-        timeDealy = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        delayjSpinner = new javax.swing.JSpinner();
         send = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -104,39 +110,42 @@ public class TcpClient extends javax.swing.JFrame {
 
         jLabel4.setText("File name :");
 
-        jLabel5.setText("Delay between messages :");
+        jLabel5.setText("Delay between messages (sec.) :");
+
+        delayjSpinner.setModel(new javax.swing.SpinnerNumberModel(3, 3, 60, 1));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(136, 136, 136)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(timeDealy, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
-                    .addComponent(filePath))
-                .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(50, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(31, 31, 31)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(filePath, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(delayjSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(46, 46, 46))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(filePath)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                        .addComponent(filePath))
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(timeDealy, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(delayjSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         send.setText("Send");
@@ -173,7 +182,7 @@ public class TcpClient extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(send, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Send", jPanel1);
@@ -355,14 +364,6 @@ public class TcpClient extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        fileChooser.setVisible(true);
-        int returnValue = fileChooser.showOpenDialog(null);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            filePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void ReceiveMessageTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReceiveMessageTableMouseClicked
     int row = ReceiveMessageTable.getSelectedRow();
     detailPanel= new DetailPanel((String)ReceiveMessageTable.getValueAt(row, 1),(String)ReceiveMessageTable.getValueAt(row, 2),(LocalDateTime)ReceiveMessageTable.getValueAt(row, 3));
@@ -389,27 +390,23 @@ public class TcpClient extends javax.swing.JFrame {
         }else{
            connectionService.disconect();
            connectionService.stopReciver();
-           messageTableModel.getDataVector().removeAllElements();
-           messageTableModel.fireTableDataChanged();
-           errorTableModel.getDataVector().removeAllElements();
-           errorTableModel.fireTableDataChanged();
+          
         }
         updateConnectionWindow();
     }//GEN-LAST:event_connectionButtonActionPerformed
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
-    if(!message.getText().isEmpty()){
-        if(connectionService.isConnected()){
-           if(connectionService.writeOnServer(message.getText())){
-               popUp.createPupup("Message send successfully...!!");
-               message.setText("");
-           }else{
-               popUp.createPupup("Message sending failed...!!");
-           }
+           if(connectionService.isConnected()){
+            if(fileChooser != null && fileChooser.getSelectedFile() != null){
+               sendMessageFromFile();
+            }else{
+                 if(!message.getText().isEmpty()){
+                    sendMessage.sendMessage(message.getText());
+                }else{
+                    messageDialogService.showError(this, "Con't send empty message..!!");
+                }
+            }
         }
-    }else{
-        messageDialogService.showError(this, "Con't send empty message..!!");
-    }
     }//GEN-LAST:event_sendActionPerformed
 
     private void errorMessageTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_errorMessageTableMouseClicked
@@ -418,6 +415,14 @@ public class TcpClient extends javax.swing.JFrame {
     dialogService.createDilog(this, "Message Detail", detailPanel);
     dialogService.setVisible(true);
     }//GEN-LAST:event_errorMessageTableMouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        fileChooser.setVisible(true);
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            filePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * To update connection window according current connection status.
@@ -433,9 +438,30 @@ public class TcpClient extends javax.swing.JFrame {
             connectionButton.setText("Connect");
             ipTextField.setEditable(true);
             portTextField.setEditable(true);
+            clearTables();
         }
     }
 
+    /**
+     * This method used to remove all rows of message and error table.
+    */
+    private static void clearTables(){
+        messageTableModel.getDataVector().removeAllElements();
+        messageTableModel.fireTableDataChanged();
+        errorTableModel.getDataVector().removeAllElements();
+        errorTableModel.fireTableDataChanged();
+    }
+
+    private void sendMessageFromFile(){ 
+        if((Integer)delayjSpinner.getValue() != null){
+                    if(validationService.isValidateNumber(delayjSpinner.getValue().toString()) && (Integer)delayjSpinner.getValue() > 0){
+                        sendMessage.sendMessage(Paths.get(fileChooser.getSelectedFile().getAbsolutePath()),message.getText(),(Integer)delayjSpinner.getValue());
+                    }else{
+                        messageDialogService.showError(this, "Invalid number in delay field..!!");
+                    }
+                }else{
+                    messageDialogService.showError(this, "Please select time delay..!!");                        
+                }}
     /**
      * This method used to add row in message table.
     */
@@ -489,6 +515,7 @@ public class TcpClient extends javax.swing.JFrame {
     private static javax.swing.JButton connectionButton;
     private static javax.swing.JPanel connectionDetailPanel;
     private static javax.swing.JLabel connectionStatus;
+    private javax.swing.JSpinner delayjSpinner;
     private javax.swing.JTable errorMessageTable;
     private javax.swing.JTextField filePath;
     private static javax.swing.JTextField ipTextField;
@@ -509,6 +536,5 @@ public class TcpClient extends javax.swing.JFrame {
     private javax.swing.JTextArea message;
     private static javax.swing.JTextField portTextField;
     private javax.swing.JButton send;
-    private javax.swing.JTextField timeDealy;
     // End of variables declaration//GEN-END:variables
 }

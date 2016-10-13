@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.services;
+package com.tcpClient.services;
 
 import java.awt.Component;
 import java.awt.Frame;

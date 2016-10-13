@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.services;
+package com.tcpClient.services;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.Timer;
-import tcpClient.swing.PopupPanel;
-import tcpClient.swing.TcpClient;
+import com.tcpClient.swing.PopupPanel;
+import com.tcpClient.swing.TcpClient;
 
 /**
  *

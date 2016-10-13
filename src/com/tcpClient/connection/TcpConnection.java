@@ -1,11 +1,11 @@
-package tcpClient.connection;
+package com.tcpClient.connection;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Logger;
-import tcpClient.swing.TcpClient;
+import com.tcpClient.swing.TcpClient;
 
 public class TcpConnection {
     private static Socket socket;

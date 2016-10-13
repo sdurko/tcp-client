@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.services;
+package com.tcpClient.connection;
 
+import com.tcpClient.messaging.service.ReceiverService;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.logging.Logger;
-import tcpClient.connection.TcpConnection;
-import tcpClient.swing.TcpClient;
+import com.tcpClient.connection.TcpConnection;
+import com.tcpClient.swing.TcpClient;
 
 /**
  *
@@ -50,10 +51,12 @@ public class ConnectionService {
        if(isConnected()){
             DataOutputStream output;
             try {
-               output = new DataOutputStream(tcpConnection.getOutputStream());
-               output.writeBytes(message);
-               output.flush();
-               return true;
+                if(!message.isEmpty()){
+                    output = new DataOutputStream(tcpConnection.getOutputStream());
+                    output.writeBytes(message);
+                    output.flush();
+                    return true;
+                }
             }
             catch (Exception e) {
                 e.printStackTrace();

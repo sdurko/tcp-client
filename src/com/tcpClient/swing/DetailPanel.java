@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpClient.swing;
+package com.tcpClient.swing;
 
 import java.time.LocalDateTime;
-import tcpClient.services.DialogService;
+import com.tcpClient.services.DialogService;
 
 /**
  *

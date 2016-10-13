@@ -1,4 +1,4 @@
-package tcpClient.services;
+package com.tcpClient.services;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
