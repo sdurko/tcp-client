@@ -17,7 +17,7 @@ public class JSON {
         JSONObject,JSONArray,Text
     };
 
-    private List<Map<String, Object>> jsonList;
+    private List<Object> jsonList;
     private Map<String, Object> jsonObject;
     private Instance instanceOf;
     private String text;
@@ -25,7 +25,7 @@ public class JSON {
     /**
     * To list of objects.
     */
-    public JSON(List<Map<String, Object>> jsonList, Instance instanceOf){
+    public JSON(List<Object> jsonList, Instance instanceOf){
         this.jsonList = jsonList;
         this.instanceOf =instanceOf;
     }
@@ -49,7 +49,7 @@ public class JSON {
     /**
     * To plane text.
     */
-    public List<Map<String, Object>> getJsonList() {
+    public List<Object> getJsonList() {
         return jsonList;
     }
 
@@ -63,6 +63,10 @@ public class JSON {
 
     public String getText() {
         return text;
+    }
+
+    public void addMessageInList(Object obj) {
+        this.jsonList.add(obj);
     }
 
 }

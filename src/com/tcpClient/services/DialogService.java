@@ -5,6 +5,7 @@
  */
 package com.tcpClient.services;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import javax.swing.JDialog;
@@ -25,6 +26,17 @@ public class DialogService {
         this.owner = owner;
         dialog = new JDialog(owner, Title, true);
         dialog.getContentPane().add(comp);
+        dialog.pack();
+    }
+
+    /**
+    * This method used to create a child window for running event.
+   */    
+    public void createDilog(Frame owner, String Title,  Component comp, int onClose){
+        this.owner = owner;
+        dialog = new JDialog(owner, Title, true);
+        dialog.add(BorderLayout.CENTER, comp);
+        dialog.setDefaultCloseOperation(onClose);
         dialog.pack();
     }
 

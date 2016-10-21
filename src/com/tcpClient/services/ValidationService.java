@@ -22,13 +22,9 @@ public class ValidationService {
 	 return matcher(NUMBER_VALIDATION, port);
     }
 
-    private Boolean matcher(String regex, String value){
+    public Boolean matcher(String regex, String value){
         matcher = Pattern.compile(regex).matcher(value);
 	  return matcher.matches();
     }
 
-    public static void main(String a[]){
-        System.out.println("ip validation "+new ValidationService().validateIp("127.0.0.1"));
-        System.out.println("port validation "+new ValidationService().validatePort("sdfdsg"));
-    }
 }
